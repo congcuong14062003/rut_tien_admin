@@ -2,15 +2,13 @@
 include '../../component/header.php';
 include '../../component/formatCardNumber.php';
 include '../../component/formatSecutiry.php';
-?>
-<?php
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     // Nếu không phải admin, chuyển hướng đến trang thông báo không có quyền
     header("Location: /no-permission");
     exit();
 }
-?>
-<?php
+
 // Định nghĩa hàm getStatusText() nếu nó không có trong các tệp bao gồm
 function getStatusText($status)
 {
@@ -82,9 +80,14 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
         <div class="content_right">
             <div class="container border_bottom">
                 <h1 class="title">Danh sách thẻ</h1>
-                <!-- <div class="search_container">
-                    <input type="text" placeholder="Tìm kiếm...">
-                </div> -->
+                <div>
+                    <form class="search_container" method="GET" action="">
+                        <input type="text" name="search" placeholder="Tìm kiếm..."
+                            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                        <button style="margin: 0 10px" type="submit">Tìm kiếm</button>
+                        <button type="button"><a href="/admin/manager-card-user">Reset</a></button>
+                    </form>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -99,10 +102,15 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
                     <tbody>
                         <?php
                         // Kết nối cơ sở dữ liệu và lấy danh sách thẻ
+                        $search = isset($_GET['search']) ? $_GET['search'] : '';
+
                         $query = "SELECT c.*, h.type FROM tbl_card c
                                   JOIN tbl_history h ON c.id_card = h.id_card
-                                  WHERE h.type = 'Thêm thẻ'";
+                                  WHERE h.type = 'Thêm thẻ' AND (c.firstName LIKE ? OR c.lastName LIKE ?)";
+
                         $stmt = $conn->prepare($query);
+                        $searchParam = '%' . $search . '%';
+                        $stmt->bind_param("ss", $searchParam, $searchParam);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
@@ -150,6 +158,12 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function () {
+            $('input[name="search"]').on('keypress', function (e) {
+                if (e.which === 13) { // Enter key pressed
+                    $(this).closest('form').submit();
+                }
+            });
+
             <?php if (isset($_SESSION['card_success'])): ?>
                 toastr.success("<?php echo $_SESSION['card_success']; ?>");
                 <?php unset($_SESSION['card_success']); ?>

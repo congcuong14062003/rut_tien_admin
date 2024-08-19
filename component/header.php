@@ -1,7 +1,7 @@
 <?php
 ob_start(); // Bật bộ đệm đầu ra
 session_start();
-// include '../db.php';
+// include '/db.php';
 
 $servername = "localhost";
 $username = "root";
