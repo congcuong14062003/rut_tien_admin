@@ -1,0 +1,127 @@
+/* Đặt kiểu mặc định cho tất cả các thiết bị */
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container_boby {
+    display: flex;
+    flex-direction: column;
+    /* Để cho các phần tử sắp xếp theo cột trên màn hình nhỏ */
+    height: calc(100vh - 60px);
+}
+
+.container_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+}
+a {
+    text-decoration: none;
+}
+.content_right {
+    flex: 1;
+}
+
+.container {
+    overflow: auto;
+    max-height: 90%;
+}
+.search_container {
+    right: 20px;
+    display: flex;
+    justify-content: right;
+    margin: 20px 0;
+}
+
+.search_container input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.search_container input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+.side_bar_mobile {
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.icon-mobile i {
+    font-size: 20px;
+    display: none;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Media Query cho thiết bị di động */
+@media (max-width: 1023px) {
+    .container {
+        margin: 100px auto 0 auto !important;
+        width: 95% !important;
+    }
+
+    button {
+        margin: 5px 0 !important;
+    }
+
+    .container_boby {
+        flex-direction: column;
+        /* Để các phần tử trong container sắp xếp theo cột */
+    }
+
+    .icon-mobile i {
+        font-size: 20px;
+        display: block;
+        margin-right: 20px;
+    }
+
+    input[type="submit"] {
+        font-size: 14px;
+        /* Giảm kích thước font cho nút submit trên thiết bị di động */
+        padding: 8px;
+        /* Giảm padding cho nút submit trên thiết bị di động */
+    }
+}
+
+/* Media Query cho thiết bị máy tính để bàn (PC) */
+@media (min-width: 1024px) {
+    .container_boby {
+        flex-direction: row;
+        /* Để các phần tử trong container sắp xếp theo hàng trên máy tính để bàn */
+    }
+
+    input[type="submit"] {
+        font-size: 16px;
+        /* Đặt lại kích thước font cho nút submit trên máy tính để bàn */
+        padding: 10px;
+        /* Đặt lại padding cho nút submit trên máy tính để bàn */
+    }
+}
