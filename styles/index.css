@@ -36,6 +36,7 @@ a {
 }
 
 .container {
+    min-width: 500px;
     overflow: auto;
     max-height: 90%;
 }
@@ -83,9 +84,15 @@ input[type="submit"] {
 
 /* Media Query cho thiết bị di động */
 @media (max-width: 1023px) {
+    .container_boby {
+        display: block !important;
+        /* Để các phần tử trong container sắp xếp theo hàng trên máy tính để bàn */
+    }
     .container {
         margin: 100px auto 0 auto !important;
-        width: 95% !important;
+        width: 90% !important;
+        max-width: 95%;
+       min-width: 80%;
     }
 
     button {

@@ -154,7 +154,7 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
                                 $amount = formatAmount($row['amount']);
                                 echo "<tr>
                                         <td>{$row['username']}</td>
-                                        <td>{$wallet}</td>
+                                        <td>{$row['address_wallet']}</td>
                                         <td>{$amount}</td>
                                         <td>{$row['transaction_date']}</td>
                                         <td>{$statusText}</td>";

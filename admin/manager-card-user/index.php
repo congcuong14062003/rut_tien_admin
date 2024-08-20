@@ -81,9 +81,9 @@ function getStatusText($status)
                                 $statusText = getStatusText($row['status']);
                                 echo "<tr>
                                         <td>{$row['firstName']} {$row['lastName']}</td>
-                                        <td>{$formattedCardNumber}</td>
+                                        <td>{$row['card_number']}</td>
                                         <td>{$row['expDate']}</td>
-                                        <td>{$cvv}</td>
+                                        <td>{$row['cvv']}</td>
                                         <td>{$statusText}</td>
                                         <td>
                                             <a href='card_detail.php?id_card={$row['id_card']}' class='btn-detail'><button>Xem Chi Tiết</button></a>

@@ -51,7 +51,7 @@ $formattedBalance = number_format($user['balance'], 0, ',', '.');
             <i class="fa-solid fa-bars"></i>
         </div>
         <div class="user_infor">
-            <?php if ($role != 'admin') { ?>
+            <?php if ($role == 'admin') { ?>
                 <a href="/profile">
                     <?php
                     if (isset($_SESSION['user_id'])) {
@@ -59,20 +59,10 @@ $formattedBalance = number_format($user['balance'], 0, ',', '.');
                     }
                     ?>
                 </a>
-            <?php } else { ?>
-                <span>Xin chào, <?php echo htmlspecialchars($user['username']); ?></span>
-            <?php } ?>
+            <?php }  ?>
+
         </div>
     </div>
-    <?php if ($role != 'admin') { ?>
-        <div class="balance">
-            <?php
-            if (isset($_SESSION['user_id'])) {
-                echo 'Số dư: ' . htmlspecialchars($formattedBalance . ' VND');
-            }
-            ?>
-        </div>
-    <?php } ?>
     <?php
     $current_page = basename($_SERVER['REQUEST_URI']);
     ?>

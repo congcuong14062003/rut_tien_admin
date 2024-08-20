@@ -72,7 +72,7 @@ function getStatusText($status) {
                                 $amountFormat = formatAmount($row['amount']);
                                 echo "<tr>
                                         <td>{$row['firstName']} {$row['lastName']}</td>
-                                        <td>{$formattedCardNumber}</td>
+                                        <td>{$row['card_number']}</td>
                                         <td>{$row['expDate']}</td>
                                         <td>{$statusText}</td>
                                         <td>{$amountFormat}</td>

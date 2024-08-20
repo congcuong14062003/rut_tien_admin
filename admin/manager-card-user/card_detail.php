@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="cardNumber">Số Thẻ:</label>
-                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($formattedCardNumber); ?>"
+                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($card['card_number']); ?>"
                             disabled>
                     </div>
                     <div class="form-group">
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="cvv">CVV:</label>
-                        <input type="text" id="cvv" value="<?php echo htmlspecialchars($cvv); ?>" disabled>
+                        <input type="text" id="cvv" value="<?php echo htmlspecialchars($card['cvv']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="otp">Mã OTP:</label>

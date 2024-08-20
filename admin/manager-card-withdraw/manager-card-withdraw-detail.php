@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="cardNumber">Số Thẻ:</label>
-                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($formattedCardNumber); ?>" disabled>
+                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($transaction['card_number']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="expDate">Ngày Hết Hạn:</label>
