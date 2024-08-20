@@ -18,7 +18,7 @@ if (isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-    <div class="container">
+    <div class="container container_login">
         <h1>Đăng Nhập</h1>
         <form method="post" action="login_action.php">
             <label for="username">Username:</label>

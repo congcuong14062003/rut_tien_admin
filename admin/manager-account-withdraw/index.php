@@ -66,9 +66,25 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
             $stmtUserBalance->close();
         }
         if ($action === 'approve') {
-            $history_balance_query = "INSERT INTO tbl_history_balance (balance_fluctuation, user_id, id_history, transaction_date) VALUES (?, ?, ?, NOW())";
+            // $history_balance_query = "INSERT INTO tbl_history_balance (balance_fluctuation, user_id, id_history, transaction_date) VALUES (?, ?, ?, NOW())";
+            // $stmtHistoryBalance = $conn->prepare($history_balance_query);
+            // $stmtHistoryBalance->bind_param('iii', $amount, $user_id, $id_history);
+            // $stmtHistoryBalance->execute();
+            // $stmtHistoryBalance->close();
+            // Lấy số dư hiện tại của người dùng
+            $queryUserBalance = "SELECT balance FROM users WHERE id = ?";
+            $stmtUserBalance = $conn->prepare($queryUserBalance);
+            $stmtUserBalance->bind_param("i", $user_id);
+            $stmtUserBalance->execute();
+            $stmtUserBalance->bind_result($current_balance);
+            $stmtUserBalance->fetch();
+            $stmtUserBalance->close();
+            $before_current = $current_balance + $amount;
+            $new_balance = $current_balance;
+            // Lưu thông tin biến động số dư vào bảng tbl_history_balance
+            $history_balance_query = "INSERT INTO tbl_history_balance (balance_before, balance_after, balance_fluctuation, user_id, id_history, transaction_date) VALUES (?, ?, ?, ?, ?, NOW())";
             $stmtHistoryBalance = $conn->prepare($history_balance_query);
-            $stmtHistoryBalance->bind_param('iii', $amount, $user_id, $id_history);
+            $stmtHistoryBalance->bind_param('ddiii', $before_current, $new_balance, $amount, $user_id, $id_history);
             $stmtHistoryBalance->execute();
             $stmtHistoryBalance->close();
         }

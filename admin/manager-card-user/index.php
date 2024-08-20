@@ -4,12 +4,10 @@ include '../../component/formatCardNumber.php';
 include '../../component/formatSecutiry.php';
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    // Nếu không phải admin, chuyển hướng đến trang thông báo không có quyền
     header("Location: /no-permission");
     exit();
 }
 
-// Định nghĩa hàm getStatusText() nếu nó không có trong các tệp bao gồm
 function getStatusText($status)
 {
     switch ($status) {
@@ -23,46 +21,10 @@ function getStatusText($status)
             return 'Không xác định';
     }
 }
-
-// Xử lý hành động chấp nhận hoặc từ chối
-if (isset($_GET['action']) && isset($_GET['id_card'])) {
-    $action = $_GET['action'];
-    $id_card = $_GET['id_card'];
-
-    // Xác định trạng thái dựa trên hành động
-    $status = ($action === 'approve') ? '1' : '2';
-
-    // Cập nhật trạng thái trong bảng tbl_card
-    $queryCard = "UPDATE tbl_card SET status = ? WHERE id_card = ?";
-    $stmtCard = $conn->prepare($queryCard);
-    $stmtCard->bind_param("si", $status, $id_card);
-
-    // Cập nhật trạng thái trong bảng tbl_history
-    $queryHistory = "UPDATE tbl_history SET status = ? WHERE id_card = ?";
-    $stmtHistory = $conn->prepare($queryHistory);
-    $stmtHistory->bind_param("si", $status, $id_card);
-
-    // Thực hiện các truy vấn và kiểm tra kết quả
-    if ($stmtCard->execute() && $stmtHistory->execute()) {
-        $message = ($action === 'approve') ? "Chấp nhận thẻ thành công." : "Từ chối thẻ thành công.";
-        $_SESSION['card_success'] = $message;
-    } else {
-        $_SESSION['card_error'] = "Đã xảy ra lỗi khi cập nhật trạng thái thẻ.";
-    }
-
-    $stmtCard->close();
-    $stmtHistory->close();
-    $conn->close();
-
-    // Chuyển hướng về trang danh sách thẻ
-    header('Location: /admin/manager-card-user');
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,7 +35,6 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <title>Danh sách thẻ</title>
 </head>
-
 <body>
     <div class="container_boby">
         <?php include '../../component/sidebar.php'; ?>
@@ -101,10 +62,9 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
                     </thead>
                     <tbody>
                         <?php
-                        // Kết nối cơ sở dữ liệu và lấy danh sách thẻ
                         $search = isset($_GET['search']) ? $_GET['search'] : '';
 
-                        $query = "SELECT c.*, h.type FROM tbl_card c
+                        $query = "SELECT c.*, h.* FROM tbl_card c
                                   JOIN tbl_history h ON c.id_card = h.id_card
                                   WHERE h.type = 'Thêm thẻ' AND (c.firstName LIKE ? OR c.lastName LIKE ?)";
 
@@ -124,22 +84,14 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
                                         <td>{$formattedCardNumber}</td>
                                         <td>{$row['expDate']}</td>
                                         <td>{$cvv}</td>
-                                        <td>{$statusText}</td>";
-
-                                // Hiển thị nút chấp nhận và từ chối chỉ khi trạng thái là '0'
-                                if ($row['status'] == '0') {
-                                    echo "<td>
-                                            <a href='?action=approve&id_card={$row['id_card']}' class='btn-accept'><button>Chấp Nhận</button></a>
-                                            <a href='?action=decline&id_card={$row['id_card']}'><button class='btn-decline'>Từ Chối</button></a>
-                                          </td>";
-                                } else {
-                                    echo "<td></td>";
-                                }
-
-                                echo "</tr>";
+                                        <td>{$statusText}</td>
+                                        <td>
+                                            <a href='card_detail.php?id_card={$row['id_card']}' class='btn-detail'><button>Xem Chi Tiết</button></a>
+                                        </td>
+                                      </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6'>Không có dữ liệu</td></tr>";
+                            echo "<tr><td colspan='7'>Không có dữ liệu</td></tr>";
                         }
 
                         $stmt->close();
@@ -150,16 +102,12 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
             </div>
         </div>
     </div>
-    <!-- Include Firebase library -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         $(document).ready(function () {
             $('input[name="search"]').on('keypress', function (e) {
-                if (e.which === 13) { // Enter key pressed
+                if (e.which === 13) { 
                     $(this).closest('form').submit();
                 }
             });
@@ -176,5 +124,4 @@ if (isset($_GET['action']) && isset($_GET['id_card'])) {
         });
     </script>
 </body>
-
 </html>
