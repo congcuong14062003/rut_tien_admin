@@ -113,6 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             disabled>
                     </div>
                     <div class="form-group">
+                        <label for="transaction_date">Ngày giao dịch:</label>
+                        <input type="text" id="transaction_date" value="<?php echo htmlspecialchars($card['transaction_date']); ?>"
+                            disabled>
+                    </div>
+                    <div class="form-group">
                         <label for="expDate">Ngày Hết Hạn:</label>
                         <input type="text" id="expDate" value="<?php echo htmlspecialchars($card['expDate']); ?>"
                             disabled>

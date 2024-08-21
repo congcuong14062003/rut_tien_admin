@@ -66,11 +66,6 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
             $stmtUserBalance->close();
         }
         if ($action === 'approve') {
-            // $history_balance_query = "INSERT INTO tbl_history_balance (balance_fluctuation, user_id, id_history, transaction_date) VALUES (?, ?, ?, NOW())";
-            // $stmtHistoryBalance = $conn->prepare($history_balance_query);
-            // $stmtHistoryBalance->bind_param('iii', $amount, $user_id, $id_history);
-            // $stmtHistoryBalance->execute();
-            // $stmtHistoryBalance->close();
             // Lấy số dư hiện tại của người dùng
             $queryUserBalance = "SELECT balance FROM users WHERE id = ?";
             $stmtUserBalance = $conn->prepare($queryUserBalance);
@@ -104,7 +99,6 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -117,6 +111,45 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
     <link rel="stylesheet" href="./listcard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <title>Danh sách yêu cầu rút tiền từ thẻ</title>
+    <style>
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007bff;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        select option {
+            padding: 10px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        select option:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -125,13 +158,30 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
         <div class="content_right">
             <div class="container border_bottom">
                 <h1 class="title">Danh sách yêu cầu rút tiền từ tài khoản</h1>
+
+                <!-- Form lọc trạng thái -->
+                <form method="GET" action="">
+                    <label for="status-filter">Lọc theo trạng thái:</label>
+                    <select id="status-filter" name="status" onchange="this.form.submit()">
+                        <option value="0" <?= (!isset($_GET['status']) || $_GET['status'] == '0') ? 'selected' : '' ?>>init
+                        </option>
+                        <option value="1" <?= (isset($_GET['status']) && $_GET['status'] == '1') ? 'selected' : '' ?>>Thành
+                            công</option>
+                        <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Thất
+                            bại</option>
+                        <option value="all" <?= (isset($_GET['status']) && $_GET['status'] == 'all') ? 'selected' : '' ?>>
+                            Tất cả</option>
+                    </select>
+                </form>
+
+
                 <table>
                     <thead>
                         <tr>
                             <th>Tên Chủ Tài Khoản</th>
                             <th>Địa chỉ ví</th>
                             <th>Số tiền muốn rút</th>
-                            <th>Ngày khởi tạo</th>
+                            <th>Ngày giao dịch</th>
                             <th>Trạng Thái</th>
                             <th>Hành Động</th>
                         </tr>
@@ -139,11 +189,25 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
                     <tbody>
                         <?php
                         // Kết nối cơ sở dữ liệu và lấy danh sách yêu cầu rút tiền từ thẻ
+                        
+                        // Nếu không có tham số 'status' trong URL, mặc định lọc theo trạng thái '0'
+                        $statusFilter = isset($_GET['status']) ? $_GET['status'] : '0';
+
                         $query = "SELECT tbl_history.*, users.*
-                        FROM tbl_history
-                        JOIN users ON tbl_history.user_id = users.id
-                        WHERE tbl_history.type = 'Rút tiền về ví'";
+                                  FROM tbl_history
+                                  JOIN users ON tbl_history.user_id = users.id
+                                  WHERE tbl_history.type = 'Rút tiền về ví'";
+
+                        // Thêm điều kiện lọc theo trạng thái nếu không chọn 'all'
+                        if ($statusFilter != 'all') {
+                            $query .= " AND tbl_history.status = ?";
+                        }
+
                         $stmt = $conn->prepare($query);
+                        if ($statusFilter != 'all') {
+                            $stmt->bind_param("s", $statusFilter);
+                        }
+
                         $stmt->execute();
                         $result = $stmt->get_result();
 
@@ -154,7 +218,7 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
                                 $amount = formatAmount($row['amount']);
                                 echo "<tr>
                                         <td>{$row['username']}</td>
-                                        <td>{$row['address_wallet']}</td>
+                                        <td>{$wallet}</td>
                                         <td>{$amount}</td>
                                         <td>{$row['transaction_date']}</td>
                                         <td>{$statusText}</td>";
@@ -184,20 +248,15 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        $(document).ready(function () {
-            <?php if (isset($_SESSION['card_success'])): ?>
-                toastr.success("<?php echo $_SESSION['card_success']; ?>");
-                <?php unset($_SESSION['card_success']); ?>
-            <?php endif; ?>
+        <?php if (isset($_SESSION['card_success'])): ?>
+            toastr.success('<?= $_SESSION['card_success'] ?>');
+            <?php unset($_SESSION['card_success']); endif; ?>
 
-            <?php if (isset($_SESSION['card_error'])): ?>
-                toastr.error("<?php echo $_SESSION['card_error']; ?>");
-                <?php unset($_SESSION['card_error']); ?>
-            <?php endif; ?>
-        });
+        <?php if (isset($_SESSION['card_error'])): ?>
+            toastr.error('<?= $_SESSION['card_error'] ?>');
+            <?php unset($_SESSION['card_error']); endif; ?>
     </script>
 </body>
 
