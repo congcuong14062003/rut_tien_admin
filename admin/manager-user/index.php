@@ -35,6 +35,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                             <th>Mật khẩu</th>
                             <th>Email</th>
                             <th>Quyền</th>
+                            <th>Ngày tạo</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -55,6 +56,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                 <td>{$formattedPassword}</td>
                 <td>{$row['email']}</td>
                 <td>{$row['role']}</td>
+                <td>{$row['create_at']}</td>
                 <td>
                     <a href='./reset-password.php?user_id={$row['id']}' class='btn-withdraw'><button>Đặt mật khẩu</button></a>";
                                 if ($row['role'] == 'admin') {

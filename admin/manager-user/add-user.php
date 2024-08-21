@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             // Nếu không có lỗi, thực hiện thêm tài khoản mới
-            $stmt = $conn->prepare("INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO users (username, password, email, role, create_at) VALUES (?, ?, ?, ?, NOW())");
             $role_user = 'admin';
             $stmt->bind_param("ssss", $username, $password, $email, $role_user);
 
