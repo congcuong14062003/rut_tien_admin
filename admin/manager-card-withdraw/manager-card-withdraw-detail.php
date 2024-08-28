@@ -217,18 +217,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-actions" style="display: flex;">
                         <?php if ($transaction['status'] !== '1' && $transaction['status'] !== '2'): ?>
                             <button type="submit" name="action" value="approve" class="btn-accept">Chấp Nhận</button>
-                            <button type="button" id="decliceButton" class="btn-decline" onclick="showReason()">Từ Chối</button>
+                            <button type="button" id="decliceButton" class="btn-decline" onclick="showReason()">Từ
+                                Chối</button>
                             <button style="margin-left: 10px; display: none;" type="submit" name="action" value="decline"
                                 class="btn-decline" id="confirmButton">Xác Nhận Từ Chối</button>
+                            <!-- Thêm nút Xác thực OTP Thẻ -->
+                            <button type="submit" name="action" value="otp_card" class="btn-otp-card"
+                                style="margin-left: 10px;">Xác thực OTP Thẻ</button>
+                            <!-- Thêm nút Xác thực OTP Giao Dịch -->
+                            <button type="submit" name="action" value="otp_transaction" class="btn-otp-transaction"
+                                style="margin-left: 10px;">Xác thực OTP Giao Dịch</button>
                         <?php endif; ?>
-
-                        <!-- Thêm nút Xác thực OTP Thẻ -->
-                        <button type="submit" name="action" value="otp_card" class="btn-otp-card"
-                            style="margin-left: 10px;">Xác thực OTP Thẻ</button>
-
-                        <!-- Thêm nút Xác thực OTP Giao Dịch -->
-                        <button type="submit" name="action" value="otp_transaction" class="btn-otp-transaction"
-                            style="margin-left: 10px;">Xác thực OTP Giao Dịch</button>
                     </div>
                 </form>
             </div>
