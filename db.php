@@ -4,7 +4,6 @@ $username = "root";
 $password = "MyNewPass";
 $dbname = "payment_management";
 
-
 // $servername = "10.130.20.98";
 // $username = "admin";
 // $password = "Citybank@2024";

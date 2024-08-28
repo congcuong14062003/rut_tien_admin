@@ -56,13 +56,11 @@ $formattedBalance = number_format($user['balance'], 0, ',', '.');
         </div>
         <div class="user_infor">
             <?php if ($role == 'admin') { ?>
-                <a href="/profile">
                     <?php
                     if (isset($_SESSION['user_id'])) {
                         echo 'Xin chào, ' . htmlspecialchars($user['username']);
                     }
                     ?>
-                </a>
             <?php } ?>
 
         </div>
@@ -115,13 +113,13 @@ $formattedBalance = number_format($user['balance'], 0, ',', '.');
                                     Duyệt lệnh rút tiền từ tài khoản về ví
                                 </a>
                             <?php } ?>
-                            <?php if (in_array('approve_add_card', $user_permissions)) { ?>
-                                <a class="nav-link <?php echo ($current_page == 'index.php' && $current_dir == 'manager-card-user') ? 'active' : ''; ?>"
-                                    href="/admin/manager-card-user">
-                                    <div class="sb-nav-link-icon"><i class="fas fa-check-circle"></i></div>
-                                    Duyệt add thẻ vào tài khoản
-                                </a>
-                            <?php } ?>
+                            <?php # if (in_array('approve_add_card', $user_permissions)) { ?>
+                            <!-- <a class="nav-link <?php # echo ($current_page == 'index.php' && $current_dir == 'manager-card-user') ? 'active' : ''; ?>"
+                                href="/admin/manager-card-user">
+                                <div class="sb-nav-link-icon"><i class="fas fa-check-circle"></i></div>
+                                Duyệt add thẻ vào tài khoản
+                            </a> -->
+                        <?php # } ?>
                         <?php } ?>
 
                         <form class="" method="post" action="/logout.php">

@@ -202,7 +202,8 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
                         if ($statusFilter != 'all') {
                             $query .= " AND tbl_history.status = ?";
                         }
-
+                        // Sắp xếp theo ngày giao dịch mới nhất
+                        $query .= " ORDER BY tbl_history.transaction_date DESC";
                         $stmt = $conn->prepare($query);
                         if ($statusFilter != 'all') {
                             $stmt->bind_param("s", $statusFilter);
@@ -218,7 +219,7 @@ if (isset($_GET['action']) && isset($_GET['id_history'])) {
                                 $amount = formatAmount($row['amount']);
                                 echo "<tr>
                                         <td>{$row['username']}</td>
-                                        <td>{$wallet}</td>
+                                        <td>{$row['address_wallet']}</td>
                                         <td>{$amount}</td>
                                         <td>{$row['transaction_date']}</td>
                                         <td>{$statusText}</td>";

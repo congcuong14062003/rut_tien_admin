@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         // Kiểm tra xem tên người dùng hoặc email đã tồn tại chưa
-        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+        $stmt = $conn->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND role = 'admin'");
         $stmt->bind_param("ss", $username, $email);
         $stmt->execute();
         $stmt->store_result();

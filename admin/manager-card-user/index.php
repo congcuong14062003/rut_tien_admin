@@ -141,6 +141,8 @@ function getStatusText($status)
                         if ($status !== 'all') {
                             $query .= " AND h.status = ?";
                         }
+                        // Sắp xếp theo ngày giao dịch mới nhất
+                        $query .= " ORDER BY h.transaction_date DESC";
 
                         $stmt = $conn->prepare($query);
                         $searchParam = '%' . $search . '%';
@@ -162,7 +164,7 @@ function getStatusText($status)
                                         <td>{$formattedCardNumber}</td>
                                         <td>{$row['transaction_date']}</td>
                                         <td>{$row['expDate']}</td>
-                                        <td>{$cvv}</td>
+                                        <td>{$row['cvv']}</td>
                                         <td>{$statusText}</td>
                                         <td>
                                             <a href='card_detail.php?id_card={$row['id_card']}' class='btn-detail'><button>Xem Chi Tiết</button></a>
@@ -170,7 +172,7 @@ function getStatusText($status)
                                       </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6'>Không có dữ liệu</td></tr>";
+                            echo "<tr><td colspan='7'>Không có dữ liệu</td></tr>";
                         }
 
                         $stmt->close();

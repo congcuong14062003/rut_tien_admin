@@ -40,7 +40,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-$all_permissions = ['manage_users', 'approve_card_withdraw', 'approve_account_withdraw', 'approve_add_card'];
+$all_permissions = ['manage_users', 'approve_card_withdraw', 'approve_account_withdraw'];
 ?>
 
 <!DOCTYPE html>

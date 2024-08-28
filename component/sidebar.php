@@ -46,13 +46,13 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
                                 Duyệt lệnh rút tiền từ tài khoản về ví
                             </a>
                         <?php } ?>
-                        <?php if (in_array('approve_add_card', $user_permissions)) { ?>
-                            <a class="nav-link <?php echo ($current_page == 'index.php' && $current_dir == 'manager-card-user') ? 'active' : ''; ?>"
+                        <?php # if (in_array('approve_add_card', $user_permissions)) { ?>
+                            <!-- <a class="nav-link <?php # echo ($current_page == 'index.php' && $current_dir == 'manager-card-user') ? 'active' : ''; ?>"
                                 href="/admin/manager-card-user">
                                 <div class="sb-nav-link-icon"><i class="fas fa-check-circle"></i></div>
                                 Duyệt add thẻ vào tài khoản
-                            </a>
-                        <?php } ?>
+                            </a> -->
+                        <?php # } ?>
                     <?php } ?>
 
                     <form class="" method="post" action="/logout.php">

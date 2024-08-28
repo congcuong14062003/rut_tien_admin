@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="cardNumber">Số Thẻ:</label>
-                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($card['card_number']); ?>"
+                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($formattedCardNumber); ?>"
                             disabled>
                     </div>
                     <div class="form-group">

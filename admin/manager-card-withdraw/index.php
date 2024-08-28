@@ -9,7 +9,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-function getStatusText($status) {
+function getStatusText($status)
+{
     switch ($status) {
         case '0':
             return 'init';
@@ -25,6 +26,7 @@ function getStatusText($status) {
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,10 +88,14 @@ function getStatusText($status) {
                 <form method="GET" action="">
                     <label for="status-filter">Lọc theo trạng thái:</label>
                     <select id="status-filter" name="status" onchange="this.form.submit()">
-                        <option value="0" <?= (!isset($_GET['status']) || $_GET['status'] == '0') ? 'selected' : '' ?>>init</option>
-                        <option value="1" <?= (isset($_GET['status']) && $_GET['status'] == '1') ? 'selected' : '' ?>>Thành công</option>
-                        <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Thất bại</option>
-                        <option value="all" <?= (isset($_GET['status']) && $_GET['status'] == 'all') ? 'selected' : '' ?>>Tất cả</option>
+                        <option value="0" <?= (!isset($_GET['status']) || $_GET['status'] == '0') ? 'selected' : '' ?>>init
+                        </option>
+                        <option value="1" <?= (isset($_GET['status']) && $_GET['status'] == '1') ? 'selected' : '' ?>>Thành
+                            công</option>
+                        <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Thất
+                            bại</option>
+                        <option value="all" <?= (isset($_GET['status']) && $_GET['status'] == 'all') ? 'selected' : '' ?>>
+                            Tất cả</option>
                     </select>
                 </form>
 
@@ -119,7 +125,8 @@ function getStatusText($status) {
                         if ($statusFilter != 'all') {
                             $query .= " AND tbl_history.status = ?";
                         }
-
+                        // Sắp xếp theo ngày giao dịch mới nhất
+                        $query .= " ORDER BY tbl_history.transaction_date DESC";
                         $stmt = $conn->prepare($query);
                         if ($statusFilter != 'all') {
                             $stmt->bind_param("s", $statusFilter);
@@ -144,7 +151,7 @@ function getStatusText($status) {
                                     </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='6'>Không có dữ liệu</td></tr>";
+                            echo "<tr><td colspan='7'>Không có dữ liệu</td></tr>";
                         }
 
                         $stmt->close();
@@ -159,17 +166,18 @@ function getStatusText($status) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
-        $(document).ready(function() {
-            <?php if (isset($_SESSION['card_success'])) : ?>
-            toastr.success("<?php echo $_SESSION['card_success']; ?>");
-            <?php unset($_SESSION['card_success']); ?>
+        $(document).ready(function () {
+            <?php if (isset($_SESSION['card_success'])): ?>
+                toastr.success("<?php echo $_SESSION['card_success']; ?>");
+                <?php unset($_SESSION['card_success']); ?>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['card_error'])) : ?>
-            toastr.error("<?php echo $_SESSION['card_error']; ?>");
-            <?php unset($_SESSION['card_error']); ?>
+            <?php if (isset($_SESSION['card_error'])): ?>
+                toastr.error("<?php echo $_SESSION['card_error']; ?>");
+                <?php unset($_SESSION['card_error']); ?>
             <?php endif; ?>
         });
     </script>
 </body>
+
 </html>
