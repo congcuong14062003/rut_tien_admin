@@ -18,6 +18,10 @@ function getStatusText($status)
             return 'thành công';
         case '2':
             return 'thất bại';
+        case '3':
+            return 'xác thực otp thẻ';
+        case '4':
+            return 'xác thực otp giao dịch';
         default:
             return 'Không xác định';
     }
@@ -94,6 +98,10 @@ function getStatusText($status)
                             công</option>
                         <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Thất
                             bại</option>
+                        <option value="3" <?= (isset($_GET['status']) && $_GET['status'] == '3') ? 'selected' : '' ?>>Xác
+                            thực OTP thẻ</option>
+                        <option value="4" <?= (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : '' ?>>Xác
+                            thực OTP giao dịch</option>
                         <option value="all" <?= (isset($_GET['status']) && $_GET['status'] == 'all') ? 'selected' : '' ?>>
                             Tất cả</option>
                     </select>

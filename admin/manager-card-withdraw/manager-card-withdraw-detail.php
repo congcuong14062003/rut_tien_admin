@@ -9,7 +9,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-function getStatusText($status) {
+function getStatusText($status)
+{
     switch ($status) {
         case '0':
             return 'init';
@@ -17,6 +18,10 @@ function getStatusText($status) {
             return 'thành công';
         case '2':
             return 'thất bại';
+        case '3':
+            return 'xác thực otp thẻ';
+        case '4':
+            return 'xác thực otp giao dịch';
         default:
             return 'Không xác định';
     }
@@ -50,8 +55,21 @@ $amountFormat = formatAmount($transaction['amount']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : '';
-    $status = ($action === 'approve') ? '1' : '2';
-    $reason = ($action === 'decline') ? (isset($_POST['reason']) ? $_POST['reason'] : '') : '';
+    $status = '';
+    $reason = '';
+
+    if ($action === 'approve') {
+        $status = '1';
+    } elseif ($action === 'decline') {
+        $status = '2';
+        $reason = isset($_POST['reason']) ? $_POST['reason'] : '';
+    } elseif ($action === 'otp_card') {
+        $status = '3'; // Cập nhật trạng thái cho Xác thực OTP Thẻ
+
+    } elseif ($action === 'otp_transaction') {
+        $status = '4'; // Cập nhật trạng thái cho Xác thực OTP Giao Dịch
+
+    }
 
     $queryHistory = "UPDATE tbl_history SET status = ?, reason = ? WHERE id_history = ?";
     $stmtHistory = $conn->prepare($queryHistory);
@@ -92,7 +110,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtHistoryBalance->close();
         }
 
-        $_SESSION['card_success'] = ($action === 'approve') ? "Chấp nhận yêu cầu rút tiền thành công." : "Từ chối yêu cầu rút tiền thành công.";
+        // $_SESSION['card_success'] = ($action === 'approve') ? "Chấp nhận yêu cầu rút tiền thành công." : "Từ chối yêu cầu rút tiền thành công.";
+        switch ($action) {
+            case 'approve':
+                $_SESSION['card_success'] = "Chấp nhận yêu cầu rút tiền thành công.";
+                break;
+            case 'decline':
+                $_SESSION['card_success'] = "Từ chối yêu cầu rút tiền thành công.";
+                break;
+            case 'otp_card':
+                $_SESSION['card_success'] = "Yêu cầu xác thực OTP thẻ thành công.";
+                break;
+            case 'otp_transaction':
+                $_SESSION['card_success'] = "Yêu cầu xác thực OTP giao dịch thành công.";
+                break;
+            default:
+                $_SESSION['card_error'] = "Hành động không xác định.";
+                break;
+        }
         header('Location: /admin/manager-card-withdraw');
         exit();
     } else {
@@ -127,31 +162,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form method="post" action="">
                     <div class="form-group">
                         <label for="firstName">Tên Chủ Tài Khoản:</label>
-                        <input type="text" id="firstName" value="<?php echo htmlspecialchars($transaction['firstName']); ?>" disabled>
+                        <input type="text" id="firstName"
+                            value="<?php echo htmlspecialchars($transaction['firstName']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Họ Chủ Tài Khoản:</label>
-                        <input type="text" id="lastName" value="<?php echo htmlspecialchars($transaction['lastName']); ?>" disabled>
+                        <input type="text" id="lastName"
+                            value="<?php echo htmlspecialchars($transaction['lastName']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="cardNumber">Số Thẻ:</label>
-                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($formattedCardNumber); ?>" disabled>
+                        <input type="text" id="cardNumber" value="<?php echo htmlspecialchars($formattedCardNumber); ?>"
+                            disabled>
                     </div>
                     <div class="form-group">
                         <label for="transaction_date">Ngày giao dịch:</label>
-                        <input type="text" id="transaction_date" value="<?php echo htmlspecialchars($transaction['transaction_date']); ?>" disabled>
+                        <input type="text" id="transaction_date"
+                            value="<?php echo htmlspecialchars($transaction['transaction_date']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="expDate">Ngày Hết Hạn:</label>
-                        <input type="text" id="expDate" value="<?php echo htmlspecialchars($transaction['expDate']); ?>" disabled>
+                        <input type="text" id="expDate" value="<?php echo htmlspecialchars($transaction['expDate']); ?>"
+                            disabled>
                     </div>
                     <div class="form-group">
                         <label for="amount">Số tiền muốn rút:</label>
                         <input type="text" id="amount" value="<?php echo htmlspecialchars($amountFormat); ?>" disabled>
                     </div>
                     <div class="form-group">
-                        <label for="amount">Mã OTP:</label>
-                        <input type="text" id="amount" value="<?php echo htmlspecialchars($transaction['otp']); ?>" disabled>
+                        <label for="otp_card">Mã OTP xác thực thẻ:</label>
+                        <input type="text" id="otp_card"
+                            value="<?php echo htmlspecialchars($transaction['otp_card']); ?>" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="otp_transaction">Mã OTP xác thực giao dịch:</label>
+                        <input type="text" id="otp_transaction"
+                            value="<?php echo htmlspecialchars($transaction['otp_transaction']); ?>" disabled>
                     </div>
                     <div class="form-group">
                         <label for="status">Trạng Thái:</label>
@@ -160,7 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if ($transaction['status'] === '2'): ?>
                         <div class="form-group">
                             <label for="status">Lí do thất bại:</label>
-                            <input type="text" id="status" value="<?php echo htmlspecialchars($transaction['reason']); ?>" disabled>
+                            <input type="text" id="status" value="<?php echo htmlspecialchars($transaction['reason']); ?>"
+                                disabled>
                         </div>
                     <?php endif; ?>
                     <div class="form-group reason-group" id="reasonGroup" style="display: none;">
@@ -168,38 +215,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <textarea id="reason" name="reason"></textarea>
                     </div>
                     <div class="form-actions" style="display: flex;">
-                        <?php if ($transaction['status'] === '0'): ?>
+                        <?php if ($transaction['status'] !== '1' && $transaction['status'] !== '2'): ?>
                             <button type="submit" name="action" value="approve" class="btn-accept">Chấp Nhận</button>
-                            <button type="button" class="btn-decline" onclick="showReason()">Từ Chối</button>
-                            <button style="margin-left: 10px; display: none;" type="submit" name="action" value="decline" class="btn-decline" id="confirmButton">Xác Nhận Từ Chối</button>
+                            <button type="button" id="decliceButton" class="btn-decline" onclick="showReason()">Từ Chối</button>
+                            <button style="margin-left: 10px; display: none;" type="submit" name="action" value="decline"
+                                class="btn-decline" id="confirmButton">Xác Nhận Từ Chối</button>
                         <?php endif; ?>
+
+                        <!-- Thêm nút Xác thực OTP Thẻ -->
+                        <button type="submit" name="action" value="otp_card" class="btn-otp-card"
+                            style="margin-left: 10px;">Xác thực OTP Thẻ</button>
+
+                        <!-- Thêm nút Xác thực OTP Giao Dịch -->
+                        <button type="submit" name="action" value="otp_transaction" class="btn-otp-transaction"
+                            style="margin-left: 10px;">Xác thực OTP Giao Dịch</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <script>
-        function showReason() {
-            document.getElementById('reasonGroup').style.display = 'block'; // Hiện form lý do từ chối
-            document.getElementById('confirmButton').style.display = 'block'; // Hiện nút xác nhận từ chối
-            event.target.style.display = 'none'; // Ẩn nút từ chối ban đầu
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            <?php if (isset($_SESSION['card_success'])): ?>
-                toastr.success("<?php echo $_SESSION['card_success']; ?>");
-                <?php unset($_SESSION['card_success']); ?>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['card_error'])): ?>
-                toastr.error("<?php echo $_SESSION['card_error']; ?>");
-                <?php unset($_SESSION['card_error']); ?>
-            <?php endif; ?>
-        });
-    </script>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    function showReason() {
+        document.getElementById("reasonGroup").style.display = "block";
+        document.getElementById("confirmButton").style.display = "block";
+        document.getElementById("decliceButton").style.display = "none";
+    }
+
+    <?php if (isset($_SESSION['card_error'])): ?>
+        toastr.error('<?php echo $_SESSION['card_error']; ?>');
+        <?php unset($_SESSION['card_error']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['card_success'])): ?>
+        toastr.success('<?php echo $_SESSION['card_success']; ?>');
+        <?php unset($_SESSION['card_success']); ?>
+    <?php endif; ?>
+</script>
 
 </html>
