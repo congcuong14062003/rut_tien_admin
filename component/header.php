@@ -7,15 +7,15 @@ ob_start(); // Bật bộ đệm đầu ra
 session_start();
 // include '/db.php';
 
-$servername = "localhost";
-$username = "root";
-$password = "MyNewPass";
-$dbname = "payment_management";
+// $servername = "localhost";
+// $username = "root";
+// $password = "MyNewPass";
+// $dbname = "payment_management";
 
-// $servername = "10.130.20.98";
-// $username = "admin";
-// $password = "Citybank@2024";
-// $dbname = "visawd";
+$servername = "10.130.20.98";
+$username = "admin";
+$password = "Citybank@2024";
+$dbname = "visawd";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

