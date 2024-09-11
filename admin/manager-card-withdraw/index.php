@@ -186,6 +186,18 @@ function getStatusText($status)
             <?php endif; ?>
         });
     </script>
+    <script type="module">
+        import { handleOnMessage } from '/component/firebaseMessaging.js';
+        // Gọi hàm và truyền callback để xử lý thông báo
+        handleOnMessage((payload) => {
+            const notificationTitle = payload.notification.title || "Firebase Notification";
+            const notificationBody = payload.notification.body || "You have a new message.";
+
+            // Hiển thị thông báo qua alert hoặc bất kỳ UI nào bạn muốn
+            alert(`${notificationTitle}: ${notificationBody}`);
+        });
+
+    </script>
 </body>
 
 </html>
