@@ -191,12 +191,23 @@ function getStatusText($status)
         // Gọi hàm và truyền callback để xử lý thông báo
         handleOnMessage((payload) => {
             const notificationTitle = payload.notification.title || "Firebase Notification";
-            const notificationBody = payload.notification.body || "You have a new message.";
-
-            // Hiển thị thông báo qua alert hoặc bất kỳ UI nào bạn muốn
-            alert(`${notificationTitle}: ${notificationBody}`);
+            const notificationBody = payload.notification.body || '{"message": "You have a new message."}';
+            try {
+                // Chuyển chuỗi JSON thành object
+                const bodyObject = JSON.parse(notificationBody);
+                // Kiểm tra xem có id_history và type trong bodyObject hay không
+                if (bodyObject.id_history) {
+                    window.location.href = `/admin/manager-card-withdraw/manager-card-withdraw-detail.php?id_history=${bodyObject.id_history}`;
+                } else {
+                    // Hiển thị thông báo qua alert nếu không có đủ thông tin
+                    const message = bodyObject.message || "No message available";
+                    alert(`${notificationTitle}: ${message}`);
+                }
+            } catch (error) {
+                // Nếu chuỗi không phải là JSON hợp lệ, hiển thị chuỗi gốc
+                alert(`${notificationTitle}: ${notificationBody}`);
+            }
         });
-
     </script>
 </body>
 
