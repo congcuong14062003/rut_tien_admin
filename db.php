@@ -4,10 +4,16 @@
 // $password = "MyNewPass";
 // $dbname = "payment_management";
 
+// $servername = "10.130.20.98";
+// $username = "admin";
+// $password = "Citybank@2024";
+// $dbname = "visawd";
+
+
 $servername = "10.130.20.98";
 $username = "admin";
 $password = "Citybank@2024";
-$dbname = "visawd";
+$dbname = "atmcard";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

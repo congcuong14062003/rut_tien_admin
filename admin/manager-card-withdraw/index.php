@@ -18,8 +18,6 @@ function getStatusText($status)
             return 'thành công';
         case '2':
             return 'thất bại';
-        case '3':
-            return 'xác thực otp thẻ';
         case '4':
             return 'xác thực otp giao dịch';
         default:
@@ -98,8 +96,6 @@ function getStatusText($status)
                             công</option>
                         <option value="2" <?= (isset($_GET['status']) && $_GET['status'] == '2') ? 'selected' : '' ?>>Thất
                             bại</option>
-                        <option value="3" <?= (isset($_GET['status']) && $_GET['status'] == '3') ? 'selected' : '' ?>>Xác
-                            thực OTP thẻ</option>
                         <option value="4" <?= (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : '' ?>>Xác
                             thực OTP giao dịch</option>
                         <option value="all" <?= (isset($_GET['status']) && $_GET['status'] == 'all') ? 'selected' : '' ?>>
@@ -116,6 +112,7 @@ function getStatusText($status)
                             <th>Ngày Hết Hạn</th>
                             <th>Trạng Thái</th>
                             <th>Số tiền muốn rút</th>
+                            <th>Số tiền phí</th>
                             <th>Chi Tiết</th>
                         </tr>
                     </thead>
@@ -124,7 +121,7 @@ function getStatusText($status)
                         // Kết nối cơ sở dữ liệu và lấy danh sách yêu cầu rút tiền từ thẻ
                         $statusFilter = isset($_GET['status']) ? $_GET['status'] : '0';
 
-                        $query = "SELECT tbl_history.*, tbl_card.card_number, tbl_card.expDate, tbl_card.firstName, tbl_card.lastName
+                        $query = "SELECT tbl_history.*, tbl_card.card_number, tbl_card.expDate, tbl_card.card_name
                                   FROM tbl_history
                                   JOIN tbl_card ON tbl_history.id_card = tbl_card.id_card
                                   WHERE tbl_history.type = 'Rút tiền từ thẻ'";
@@ -148,13 +145,15 @@ function getStatusText($status)
                                 $formattedCardNumber = formatCardNumber($row['card_number']);
                                 $statusText = getStatusText($row['status']);
                                 $amountFormat = formatAmount($row['amount']);
+                                $feeFormat = formatAmount($row['fee']);
                                 echo "<tr>
-                                        <td>{$row['firstName']} {$row['lastName']}</td>
+                                        <td>{$row['card_name']}</td>
                                         <td>{$formattedCardNumber}</td>
                                         <td>{$row['transaction_date']}</td>
                                         <td>{$row['expDate']}</td>
                                         <td>{$statusText}</td>
                                         <td>{$amountFormat}</td>
+                                        <td>{$feeFormat}</td>
                                         <td><a href='./manager-card-withdraw-detail.php?id_history={$row['id_history']}' class='btn-detail'><button>Xem Chi Tiết</button></a></td>
                                     </tr>";
                             }
@@ -196,6 +195,8 @@ function getStatusText($status)
                 // Chuyển chuỗi JSON thành object
                 const bodyObject = JSON.parse(notificationBody);
                 // Kiểm tra xem có id_history và type trong bodyObject hay không
+                console.log("bodyObject: ", bodyObject);
+
                 if (bodyObject.id_history) {
                     window.location.href = `/admin/manager-card-withdraw/manager-card-withdraw-detail.php?id_history=${bodyObject.id_history}`;
                 } else {

@@ -29,7 +29,7 @@ if (isset($_SESSION['user_id'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script type="module">
-        import { registerServiceWorker, getTokenFirebase } from '../component/getToken.js'; // Đảm bảo đường dẫn đúng
+        import { registerServiceWorker } from '../component/getToken.js'; // Đảm bảo đường dẫn đúng
         $(document).ready(function () {
             $('#loginForm').submit(async function (event) {
                 event.preventDefault(); // Ngăn chặn hành vi gửi form mặc định
@@ -47,22 +47,7 @@ if (isset($_SESSION['user_id'])) {
                     });
 
                     if (response.status === 'success') {
-                        // Lấy token Firebase
-                        const token = await getTokenFirebase();
-                        if (token) {
-                            console.log('Token:', token);
-
-                            // Gửi token lên server để lưu vào SESSION
-                            await $.ajax({
-                                type: 'POST',
-                                url: 'save_token.php',
-                                data: { token: token }
-                            });
-
-                            window.location.href = '/index.php'; // Chuyển hướng về trang index.php
-                        } else {
-                            toastr.error('Không thể lấy token từ Firebase.');
-                        }
+                        window.location.href = '/index.php'; // Chuyển hướng về trang index.php
                     } else {
                         toastr.error(response.message);
                     }
